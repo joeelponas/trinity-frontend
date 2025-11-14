@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { supabase } from '../utils/supabaseClient';
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
@@ -12,9 +13,10 @@ export default function Home() {
     setLoading(true);
     setError(null);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/generate`,
-        { prompt }
+        { prompt, userId: user?.id || null }
       );
       setImageUrl(res.data.imageUrl);
     } catch (err) {
